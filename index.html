@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0B6B3A">
+    <meta name="description" content="Sistema Operacional AGROTESP - Controle de Pulverização com Drone">
+    <title>AGROTESP Pulverização</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo-icon">🚁</div>
+                <div class="logo-text">
+                    <h1>AGROTESP</h1>
+                    <span>Pulverização</span>
+                </div>
+            </div>
+            <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+```
+<!-- Navigation Menu -->
+<nav class="main-nav" id="mainNav">
+    <a href="#dashboard" class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Dashboard</span>
+    </a>
+    <a href="#novo" class="nav-item" data-page="novo">
+        <span class="nav-icon">➕</span>
+        <span class="nav-label">Novo</span>
+    </a>
+    <a href="#execucao" class="nav-item hidden" data-page="execucao" id="navExecucao">
+        <span class="nav-icon">▶️</span>
+        <span class="nav-label">Em Execução</span>
+    </a>
+    <a href="#produtos" class="nav-item" data-page="produtos">
+        <span class="nav-icon">🧪</span>
+        <span class="nav-label">Produtos</span>
+    </a>
+    <a href="#calculadora" class="nav-item" data-page="calculadora">
+        <span class="nav-icon">🔢</span>
+        <span class="nav-label">Calculadora</span>
+    </a>
+    <a href="#clima" class="nav-item" data-page="clima">
+        <span class="nav-icon">🌤️</span>
+        <span class="nav-label">Clima</span>
+    </a>
+    <a href="#fila" class="nav-item" data-page="fila">
+        <span class="nav-icon">📤</span>
+        <span class="nav-label">Fila</span>
+    </a>
+    <a href="#configuracoes" class="nav-item" data-page="configuracoes">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Config</span>
+    </a>
+</nav>
+
+<!-- Main Content Container -->
+<main class="main-content" id="mainContent">
+    
+    <!-- Dashboard Page -->
+    <section class="page active" id="page-dashboard">
+        <div class="page-header">
+            <h2>Dashboard</h2>
+            <p class="subtitle">Visão geral dos atendimentos</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon green">📋</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalAtendimentos">0</span>
+                    <span class="stat-label">Total de Atendimentos</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">⏳</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="emAndamento">0</span>
+                    <span class="stat-label">Em Andamento</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow">📤</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="aguardandoEnvio">0</span>
+                    <span class="stat-label">Aguardando Envio</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">✅</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="enviados">0</span>
+                    <span class="stat-label">Enviados</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h3>Atendimentos Recentes</h3>
+        </div>
+
+        <div id="atendimentosLista" class="atendimentos-lista">
+            <!-- Lista será preenchida dinamicamente -->
+        </div>
+    </section>
+
+    <!-- Novo Atendimento Page -->
+    <section class="page" id="page-novo">
+        <div class="page-header">
+            <h2>Novo Atendimento</h2>
+            <p class="subtitle">Iniciar novo serviço de pulverização</p>
+        </div>
+
+        <form class="form-atendimento" id="formNovoAtendimento">
+            <div class="form-section">
+                <h3>Informações do Cliente</h3>
+                
+                <div class="form-group">
+                    <label for="proprietario">Nome do Proprietário *</label>
+                    <input type="text" id="proprietario" required placeholder="Nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label for="fazenda">Nome da Fazenda / Local *</label>
+                    <input type="text" id="fazenda" required placeholder="Ex: Fazenda Santa Rita">
+                </div>
+
+                <div class="form-group">
+                    <label for="operador">Nome do Operador *</label>
+                    <input type="text" id="operador" required placeholder="Nome do operador">
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Localização GPS</h3>
+                
+                <button type="button" class="btn btn-secondary btn-block" id="btnCapturarGPS">
+                    <span class="btn-icon">📍</span>
+                    Capturar Localização GPS
+                </button>
+
+                <div id="gpsStatus" class="gps-status hidden">
+                    <div class="gps-info">
+                        <div class="info-row">
+                            <span class="label">Latitude:</span>
+                            <span class="value" id="gpsLat">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Longitude:</span>
+                            <span class="value" id="gpsLng">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Precisão:</span>
+                            <span class="value">
+                                <span id="gpsPrecisao">-</span> m
+                                <span class="precision-badge" id="gpsPrecisaoBadge"></span>
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Município:</span>
+                            <span class="value" id="gpsMunicipio">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Estado:</span>
+                            <span class="value" id="gpsEstado">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Observações</h3>
+                <div class="form-group">
+                    <label for="observacoes">Observações Gerais</label>
+                    <textarea id="observacoes" rows="4" placeholder="Informações adicionais sobre o atendimento"></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span class="btn-icon">✓</span>
+                    Iniciar Atendimento
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Atendimento em Execução Page -->
+    <section class="page" id="page-execucao">
+        <div class="page-header">
+            <h2>Atendimento em Execução</h2>
+            <p class="subtitle">Controle do atendimento atual</p>
+        </div>
+
+        <div id="noExecucaoMsg" class="empty-state">
+            <span class="empty-icon">📋</span>
+            <p>Nenhum atendimento em execução</p>
+            <p class="subtitle-sm">Inicie um novo atendimento para continuar</p>
+        </div>
+
+        <div id="execucaoContent" class="hidden">
+            <!-- Resumo do Atendimento -->
+            <div class="form-section">
+                <h3>Resumo do Atendimento</h3>
+                <div class="info-row">
+                    <span class="label">Proprietário:</span>
+                    <span class="value" id="execProprietario">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Fazenda:</span>
+                    <span class="value" id="execFazenda">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Operador:</span>
+                    <span class="value" id="execOperador">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Local:</span>
+                    <span class="value" id="execLocal">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Iniciado em:</span>
+                    <span class="value" id="execInicio">-</span>
+                </div>
+            </div>
+
+            <!-- Status de Progresso -->
+            <div class="form-section">
+                <h3>Progresso</h3>
+                <div class="checklist-item" id="checkGPS">
+                    <span class="check-icon">⬜</span>
+                    <span class="check-label">GPS Capturado</span>
+                </div>
+                <div class="checklist-item" id="checkProdutos">
+                    <span class="check-icon">⬜</span>
+                    <span class="check-label">Produtos Adicionados</span>
+                </div>
+                <div class="checklist-item" id="checkCalculos">
+                    <span class="check-icon">⬜</span>
+                    <span class="check-label">Cálculos Realizados</span>
+                </div>
+                <div class="checklist-item" id="checkClima">
+                    <span class="check-icon">⬜</span>
+                    <span class="check-label">Clima Registrado</span>
+                </div>
+            </div>
+
+            <!-- Navegação Rápida -->
+            <div class="form-section">
+                <h3>Ações Rápidas</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="navigateToPage('produtos')">
+                        <span class="btn-icon">🧪</span>
+                        Produtos
+                    </button>
+                    <button class="btn btn-secondary" onclick="navigateToPage('calculadora')">
+                        <span class="btn-icon">🔢</span>
+                        Calculadora
+                    </button>
+                    <button class="btn btn-secondary" onclick="navigateToPage('clima')">
+                        <span class="btn-icon">🌤️</span>
+                        Clima
+                    </button>
+                    <button class="btn btn-secondary" onclick="viewAtendimentoDetalhado()">
+                        <span class="btn-icon">👁️</span>
+                        Ver Detalhes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botão Finalizar (fixo no bottom) -->
+            <div class="finalizar-container">
+                <button class="btn btn-finalizar" id="btnFinalizarAtendimento">
+                    <span class="btn-icon">✅</span>
+                    Finalizar Atendimento
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Produtos e Calda Page -->
+    <section class="page" id="page-produtos">
+        <div class="page-header">
+            <h2>Produtos e Calda</h2>
+            <p class="subtitle">Gerenciar produtos do atendimento atual</p>
+        </div>
+
+        <div id="noProdutosMsg" class="empty-state">
+            <span class="empty-icon">🧪</span>
+            <p>Nenhum atendimento ativo</p>
+            <p class="subtitle-sm">Inicie um novo atendimento para adicionar produtos</p>
+        </div>
+
+        <div id="produtosContent" class="hidden">
+            <button class="btn btn-primary btn-block" id="btnAdicionarProduto">
+                <span class="btn-icon">➕</span>
+                Adicionar Produto
+            </button>
+
+            <div id="produtosLista" class="produtos-lista">
+                <!-- Produtos serão listados aqui -->
+            </div>
+
+            <div class="resumo-calda" id="resumoCalda">
+                <!-- Resumo será calculado -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculadora Page -->
+    <section class="page" id="page-calculadora">
+        <div class="page-header">
+            <h2>Calculadora Operacional</h2>
+            <p class="subtitle">Planejamento da operação</p>
+        </div>
+
+        <div id="noCalcMsg" class="empty-state">
+            <span class="empty-icon">🔢</span>
+            <p>Nenhum atendimento ativo</p>
+            <p class="subtitle-sm">Inicie um novo atendimento para usar a calculadora</p>
+        </div>
+
+        <div id="calculadoraContent" class="hidden">
+            <form class="form-calculadora" id="formCalculadora">
+                <div class="form-group">
+                    <label for="areaTotal">Área Total (ha) *</label>
+                    <input type="number" id="areaTotal" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="taxaAplicacao">Taxa de Aplicação (L/ha) *</label>
+                    <input type="number" id="taxaAplicacao" step="0.1" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacidadeTanque">Capacidade do Tanque (L) *</label>
+                    <input type="number" id="capacidadeTanque" step="1" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="produtividade">Produtividade (ha/h) *</label>
+                    <input type="number" id="produtividade" step="0.1" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="margemOperacional">Margem Operacional (%)</label>
+                    <input type="number" id="margemOperacional" step="1" min="0" max="100" value="10">
+                </div>
+
+                <button type="button" class="btn btn-primary btn-block" id="btnCalcular">
+                    <span class="btn-icon">🔢</span>
+                    Calcular
+                </button>
+            </form>
+
+            <div id="resultadosCalc" class="resultados-calc hidden">
+                <h3>Resultados</h3>
+                <div class="calc-result">
+                    <span class="label">Calda Total:</span>
+                    <span class="value" id="caldaTotal">-</span>
+                </div>
+                <div class="calc-result">
+                    <span class="label">Abastecimentos:</span>
+                    <span class="value" id="numAbastecimentos">-</span>
+                </div>
+                <div class="calc-result">
+                    <span class="label">Área por Tanque:</span>
+                    <span class="value" id="areaPorTanque">-</span>
+                </div>
+                <div class="calc-result">
+                    <span class="label">Voos Estimados:</span>
+                    <span class="value" id="numVoos">-</span>
+                </div>
+                <div class="calc-result">
+                    <span class="label">Tempo Estimado:</span>
+                    <span class="value" id="tempoEstimado">-</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Clima Page -->
+    <section class="page" id="page-clima">
+        <div class="page-header">
+            <h2>Registro Climático</h2>
+            <p class="subtitle">Monitoramento das condições durante o serviço</p>
+        </div>
+
+        <div id="noClimaMsg" class="empty-state">
+            <span class="empty-icon">🌤️</span>
+            <p>Nenhum atendimento ativo</p>
+            <p class="subtitle-sm">Inicie um novo atendimento para registrar o clima</p>
+        </div>
+
+        <div id="climaContent" class="hidden">
+            <div class="clima-actions">
+                <button class="btn btn-primary" id="btnRegistrarClimaAuto">
+                    <span class="btn-icon">🌐</span>
+                    Capturar Automático
+                </button>
+                <button class="btn btn-secondary" id="btnRegistrarClimaManual">
+                    <span class="btn-icon">✏️</span>
+                    Registro Manual
+                </button>
+            </div>
+
+            <div class="semaforo-container" id="semaforoAtual">
+                <h3>Condição Atual</h3>
+                <div class="semaforo-card">
+                    <div class="semaforo-indicator" id="semaforoIndicator">
+                        <div class="semaforo-light"></div>
+                    </div>
+                    <div class="semaforo-info">
+                        <div class="semaforo-status" id="semaforoStatus">Aguardando leitura</div>
+                        <div class="semaforo-motivo" id="semaforoMotivo"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="climaRegistros" class="clima-registros">
+                <h3>Histórico de Registros</h3>
+                <div id="climaLista">
+                    <!-- Registros climáticos -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fila de Envio Page -->
+    <section class="page" id="page-fila">
+        <div class="page-header">
+            <h2>Fila de Envio</h2>
+            <p class="subtitle">Relatórios aguardando envio</p>
+        </div>
+
+        <div id="filaLista" class="fila-lista">
+            <!-- Fila de envio -->
+        </div>
+    </section>
+
+    <!-- Configurações Page -->
+    <section class="page" id="page-configuracoes">
+        <div class="page-header">
+            <h2>Configurações</h2>
+            <p class="subtitle">Ajustes do sistema</p>
+        </div>
+
+        <div class="config-section">
+            <h3>EmailJS</h3>
+            <div class="form-group">
+                <label for="emailjsServiceId">Service ID</label>
+                <input type="text" id="emailjsServiceId" placeholder="seu_service_id">
+            </div>
+            <div class="form-group">
+                <label for="emailjsTemplateId">Template ID</label>
+                <input type="text" id="emailjsTemplateId" placeholder="seu_template_id">
+            </div>
+            <div class="form-group">
+                <label for="emailjsPublicKey">Public Key</label>
+                <input type="text" id="emailjsPublicKey" placeholder="sua_public_key">
+            </div>
+            <div class="form-group">
+                <label for="emailDestino">Email Destino</label>
+                <input type="email" id="emailDestino" placeholder="contato@agrotesp.com">
+            </div>
+            <button class="btn btn-primary btn-block" id="btnSalvarConfig">
+                <span class="btn-icon">💾</span>
+                Salvar Configurações
+            </button>
+        </div>
+
+        <div class="config-section">
+            <h3>API Keys</h3>
+            <div class="form-group">
+                <label for="weatherApiKey">OpenWeatherMap API Key</label>
+                <input type="text" id="weatherApiKey" placeholder="sua_api_key">
+                <small>Obtenha em: <a href="https://openweathermap.org/api" target="_blank">openweathermap.org</a></small>
+            </div>
+            <button class="btn btn-primary btn-block" id="btnSalvarApiKeys">
+                <span class="btn-icon">💾</span>
+                Salvar API Keys
+            </button>
+        </div>
+
+        <div class="config-section">
+            <h3>Dados do Sistema</h3>
+            <button class="btn btn-secondary btn-block" id="btnExportarDados">
+                <span class="btn-icon">📥</span>
+                Exportar Dados
+            </button>
+            <button class="btn btn-danger btn-block" id="btnLimparDados">
+                <span class="btn-icon">🗑️</span>
+                Limpar Todos os Dados
+            </button>
+        </div>
+
+        <div class="app-info">
+            <p><strong>AGROTESP Pulverização</strong></p>
+            <p>Versão 1.0.0</p>
+            <p>Sistema de Controle de Pulverização com Drone</p>
+        </div>
+    </section>
+
+</main>
+
+<!-- Modal para adicionar produto -->
+<div class="modal" id="modalProduto">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalProdutoTitle">Adicionar Produto</h3>
+            <button class="modal-close" id="btnFecharModalProduto">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="formProduto">
+                <div class="form-group">
+                    <label for="produtoTipo">Tipo</label>
+                    <select id="produtoTipo">
+                        <option value="Herbicida">Herbicida</option>
+                        <option value="Inseticida">Inseticida</option>
+                        <option value="Fungicida">Fungicida</option>
+                        <option value="Adjuvante">Adjuvante</option>
+                        <option value="Fertilizante">Fertilizante</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="produtoNome">Nome Comercial *</label>
+                    <input type="text" id="produtoNome" required>
+                </div>
+                <div class="form-group">
+                    <label for="produtoIngrediente">Ingrediente Ativo</label>
+                    <input type="text" id="produtoIngrediente">
+                </div>
+                <div class="form-group">
+                    <label for="produtoFabricante">Fabricante</label>
+                    <input type="text" id="produtoFabricante">
+                </div>
+                <div class="form-group">
+                    <label for="produtoLote">Lote</label>
+                    <input type="text" id="produtoLote">
+                </div>
+                <div class="form-group">
+                    <label for="produtoDose">Dose (L/ha ou kg/ha) *</label>
+                    <input type="number" id="produtoDose" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="produtoObs">Observações</label>
+                    <textarea id="produtoObs" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelarProduto">Cancelar</button>
+            <button class="btn btn-primary" id="btnSalvarProduto">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para clima manual -->
+<div class="modal" id="modalClimaManual">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Registro Manual de Clima</h3>
+            <button class="modal-close" id="btnFecharModalClima">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="formClimaManual">
+                <div class="form-group">
+                    <label for="climaTemp">Temperatura (°C) *</label>
+                    <input type="number" id="climaTemp" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="climaUmidade">Umidade (%) *</label>
+                    <input type="number" id="climaUmidade" step="1" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="climaVento">Vento (km/h) *</label>
+                    <input type="number" id="climaVento" step="0.1" min="0" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelarClima">Cancelar</button>
+            <button class="btn btn-primary" id="btnSalvarClima">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p id="loadingText">Processando...</p>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+<script src="app.js"></script>
+```
+
+</body>
+</html>
